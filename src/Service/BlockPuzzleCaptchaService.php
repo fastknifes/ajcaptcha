@@ -27,20 +27,17 @@ class BlockPuzzleCaptchaService extends Service
         $cacheEntity->set($data['token'], [
             'secretKey' => $data['secretKey'],
             'point' => $blockImage->getPoint()
-        ], 7200);
+        ], $this->factory->getConfig()['cache']['options']['expire'] ?? 300);
         return $data;
     }
-
-
 
 
     /**
      * 验证
      * @param string $token
      * @param string $pointJson
-     * @param null $callback
      */
-    public function validate( $token,  $pointJson, $callback = null)
+    public function validate($token, $pointJson)
     {
         //获取并设置 $this->originData
         $this->setOriginData($token);
@@ -54,8 +51,5 @@ class BlockPuzzleCaptchaService extends Service
 
         //检查
         $blockData->check($this->originData['point'], $targetPoint);
-        if($callback instanceof \Closure){
-            $callback();
-        }
     }
 }

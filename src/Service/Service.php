@@ -27,7 +27,7 @@ abstract class Service
     abstract public function get();
 
 
-    abstract public function validate( $token,  $pointJson, $callback = null);
+    abstract public function validate( $token,  $pointJson);
 
     /**
      * 一次验证
@@ -36,9 +36,14 @@ abstract class Service
      */
     public function check($token, $pointJson)
     {
-        $this->validate($token, $pointJson, function () use ($token, $pointJson) {
-            $this->setEncryptCache($token, $pointJson);
-        });
+        try {
+            $this->validate($token, $pointJson);
+        }catch (\RuntimeException $e){
+            $cacheEntity = $this->factory->getCacheInstance();
+            $cacheEntity->delete($token);
+            throw $e;
+        }
+        $this->setEncryptCache($token, $pointJson);
     }
 
     private function setEncryptCache($token, $pointJson){
@@ -50,7 +55,7 @@ abstract class Service
                 'token' => $token,
                 'point' => $pointJson
             ],
-            600
+            $this->factory->getConfig()['cache']['options']['expire'] ?? 300
         );
     }
 
@@ -62,10 +67,12 @@ abstract class Service
      */
     public function verification($token, $pointJson)
     {
-        $this->validate($token, $pointJson, function () use ($token) {
+        try {
+            $this->validate($token, $pointJson);
+        } finally {
             $cacheEntity = $this->factory->getCacheInstance();
             $cacheEntity->delete($token);
-        });
+        }
     }
 
     /**
@@ -80,12 +87,13 @@ abstract class Service
             throw new ParamException('参数错误！');
         }
 
-        $this->validate($result['token'], $result['point'], function () use ($result,$encryptCode) {
+        try {
+            $this->validate($result['token'], $result['point']);
+        } finally {
             $cacheEntity = $this->factory->getCacheInstance();
             $cacheEntity->delete($result['token']);
             $cacheEntity->delete($encryptCode);
-        });
-
+        }
     }
 
     /**

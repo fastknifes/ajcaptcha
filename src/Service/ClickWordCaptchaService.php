@@ -30,7 +30,7 @@ class ClickWordCaptchaService extends Service
         $cacheEntity->set($data['token'], [
             'secretKey' => $data['secretKey'],
             'point' => $wordImage->getPoint()
-        ],7200);
+        ],$this->factory->getConfig()['cache']['options']['expire'] ?? 300);
         return $data;
     }
 
@@ -39,9 +39,8 @@ class ClickWordCaptchaService extends Service
      * 验证
      * @param $token
      * @param $pointJson
-     * @param null $callback
      */
-    public function validate($token, $pointJson, $callback = null)
+    public function validate($token, $pointJson)
     {
         //获取并设置 $this->originData
         $this->setOriginData($token);
@@ -54,9 +53,6 @@ class ClickWordCaptchaService extends Service
 
         //检查
         $wordData->check($this->originData['point'], $targetPointList);
-        if ($callback instanceof \Closure) {
-            $callback();
-        }
     }
 
 

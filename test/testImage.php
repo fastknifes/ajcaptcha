@@ -25,4 +25,4 @@ function showWord()
     $blockImage->echo();
 }
 
-showWord();
+showBlock();

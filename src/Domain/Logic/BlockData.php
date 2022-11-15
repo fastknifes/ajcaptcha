@@ -38,10 +38,10 @@ class BlockData extends BaseData
     /**
      * 获取剪切模板Vo
      * @param BackgroundVo $backgroundVo
-     * @param array $templates
+     * @param array | string $templates
      * @return TemplateVo
      */
-    public function getTemplateVo(BackgroundVo $backgroundVo, array $templates = []): TemplateVo
+    public function getTemplateVo(BackgroundVo $backgroundVo, $templates = []): TemplateVo
     {
         $background = $backgroundVo->image;
         //初始偏移量，让模板图在背景的右1/2位置
@@ -89,7 +89,11 @@ class BlockData extends BaseData
     }
 
 
-    protected function getTemplateImages(array $templates = [])
+    /**
+     * @param array|string $templates
+     * @return array|false
+     */
+    protected function getTemplateImages($templates = [])
     {
         $dir = dirname(__DIR__, 3) . '/resources/defaultImages/jigsaw/slidingBlock/';
         return $this->getDefaultImage($dir, $templates);

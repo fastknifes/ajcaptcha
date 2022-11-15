@@ -158,4 +158,13 @@ class Factory
     {
         return (new BlockData())->setFaultOffset($this->config['block_puzzle']['offset']);
     }
+
+    /**
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
 }
