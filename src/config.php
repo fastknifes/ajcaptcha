@@ -5,7 +5,8 @@ return [
     'font_file' => '', //自定义字体包路径， 不填使用默认值
     //文字验证码
     'click_world' => [
-        'backgrounds' => []
+        'backgrounds' => [],
+        'word_num' => 4, //写入多少字文字（2-5）
     ],
     //滑动验证码
     'block_puzzle' => [
