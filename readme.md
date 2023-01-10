@@ -22,7 +22,7 @@ PHP实现： https://gitee.com/fastknife/aj-captcha
 * 滑动验证图响应时间慢？
    > 性能慢的主要原因是受php GD库的imagecolorat函数与imagesetpixel函数性能的影响
   1. 您可以尝试将修改内存`ini_set('memory_limit', '256M')`
-  2. 将本包升级到1.1.x版本，开启像素缓存`block_puzzle.is_cache_pixel = true`, 若还是性能还是慢，则将干扰图片关闭`block_puzzle.is_interfere => false`
+  2. 将本包升级到1.1.0以上的版本，开启像素缓存`block_puzzle.is_cache_pixel = true`, 若还是性能还是慢，则将干扰图片关闭`block_puzzle.is_interfere => false`
 #### 如何使用
 test 目录下示例了三种使用方式，phper可以参考使用。[查看demo](./demo.md)
 > 本软件包需要配合composer一起使用
