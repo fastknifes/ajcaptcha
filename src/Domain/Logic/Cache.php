@@ -108,7 +108,7 @@ class Cache
     }
 
     protected function execute(string $method, array $params){
-        return $this->driver->$method(...$params);
+        return $this->driver->$method(urlencode(array_shift($params)),...$params);
     }
 
 }
