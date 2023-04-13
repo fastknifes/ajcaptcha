@@ -21,11 +21,13 @@ return [
         'is_cache_pixel' => true, //是否开启缓存图片像素值，开启后能提升服务端响应性能（但要注意更换图片时，需要清除缓存）
 
         'is_interfere' => true, //开启干扰图
+
+        'blur_num' => 3, //扣图模糊系数。选值1~10之间。数值越大越模糊
     ],
     //水印
     'watermark' => [
         'fontsize' => 12,
-        'color' => '#000000',
+        'color' => '#ffffff',
         'text' => '我的水印'
     ],
     'cache' => [

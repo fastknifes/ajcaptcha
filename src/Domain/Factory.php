@@ -81,6 +81,10 @@ class Factory
 
         $image->setTemplateVo($templateVo);
 
+        if (isset($this->config['block_puzzle']['blur_num'])) {
+            $image->setBlurNum(intval($this->config['block_puzzle']['blur_num']));
+        }
+
         $pixelMaps = [$backgroundVo, $templateVo];
         if (
             isset($this->config['block_puzzle']['is_interfere']) &&

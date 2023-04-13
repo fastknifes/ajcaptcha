@@ -23,6 +23,8 @@ class BlockImage extends BaseImage
      */
     protected $interfereVo;
 
+    public $blurNum = 2;
+
 
     /**
      * @return TemplateVo
@@ -51,6 +53,15 @@ class BlockImage extends BaseImage
     }
 
     /**
+     * @param int $blurNum
+     */
+    public function setBlurNum(int $blurNum): void
+    {
+        $this->blurNum = $blurNum;
+    }
+
+
+    /**
      * @param TemplateVo $interfereVo
      * @return static
      */
@@ -71,9 +82,11 @@ class BlockImage extends BaseImage
                 $flag = true;
             }
         });
+
         if (!empty($this->interfereVo)) {
             $this->cutByTemplate($this->interfereVo, $this->backgroundVo);
         }
+
         $this->makeWatermark($this->backgroundVo->image);
     }
 
@@ -88,22 +101,20 @@ class BlockImage extends BaseImage
                 //背景图对应的坐标
                 $bgX = $x + $templateVo->offset->x;
                 $bgY = $y + $templateVo->offset->y;
-                //是否不透明
-                $isOpacity = $templateVo->isOpacity($x, $y);
-                if ($isOpacity) {    //如果不透明
+                //是否为边框
+                if ($templateVo->isBoundary($x, $y)) {
                     if ($callable instanceof \Closure) {
                         $callable([$bgX, $bgY]);
                     }
-                    $backgroundVo->vagueImage($bgX, $bgY);//模糊背景图选区
-
-                    $this->copyPickColor($backgroundVo, $bgX, $bgY, $templateVo, $x, $y);
-                }
-                if ($templateVo->isBoundary($isOpacity, $x, $y)) {
-                    $backgroundVo->setPixel(self::WHITE, $bgX, $bgY);
+                    $backgroundVo->setPixel(self::WHITE , $bgX, $bgY);
                     $templateVo->setPixel(self::WHITE, $x, $y);
+                } else if ($templateVo->isOpacity($x, $y)) {
+                    $backgroundVo->recordBlurImage($bgX, $bgY);//模糊背景图选区
+                    $this->copyPickColor($backgroundVo, $bgX, $bgY, $templateVo, $x, $y);
                 }
             }
         }
+        $backgroundVo->blur($this->blurNum);
     }
 
     /**
