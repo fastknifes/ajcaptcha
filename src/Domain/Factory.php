@@ -105,7 +105,7 @@ class Factory
                 } else {
                     $vo->preparePickMaps();
                     $vo->setFinishCallback(function (ImageVo $imageVo) use ($cache, $key) {
-                        $cache->set($key, $imageVo->getPickMaps(), 0);
+                        $cache->set($key, $imageVo->getPickMaps());
                     });
                 }
             }
