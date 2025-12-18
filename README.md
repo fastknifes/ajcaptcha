@@ -163,10 +163,12 @@ return [
     'cache' => [
         'constructor' => \Fastknife\Utils\CacheUtils::class,
         'method' => [
-            'get' => 'get',
-            'set' => 'set',
-            'delete' => 'delete',
-            'has' => 'has'
+            // 如果您的缓存驱动符合 PSR-16 规范 (如 Laravel, TP6, Hyperf)，则无需配置此项
+            // 如果是不兼容的旧框架 (如 TP5)，需在此处做方法映射
+            'get' => 'get',      // 获取缓存方法名
+            'set' => 'set',      // 设置缓存方法名
+            'delete' => 'delete',// 删除缓存方法名 (TP5 为 'rm')
+            'has' => 'has'       // 检查存在方法名
         ],
         'options' => [
             'expire' => 300, // 300秒有效期
@@ -177,33 +179,51 @@ return [
 ];
 ```
 
-### 框架缓存集成
+### 框架缓存集成详解
 
-如果您使用 Laravel, ThinkPHP 或 Hyperf 等框架，建议替换默认缓存驱动以获得更好性能。
+如果您使用现代 PHP 框架，建议替换默认的内置文件缓存以获得更好性能（如 Redis）。
 
-**Laravel 配置示例**:
+#### 1. 方法映射 (适配非 PSR-16 框架)
+本库默认期望缓存驱动遵循 PSR-16 规范。如果您的框架缓存方法名不同（例如 ThinkPHP 5.0 使用 `rm` 而不是 `delete`），您需要通过 `method` 配置项进行映射：
+
+```php
+// ThinkPHP 5.0 示例
+'cache' => [
+    'constructor' => [think\Cache::class, 'store'],
+    'method' => [
+        'get' => 'get',
+        'set' => 'set',
+        'delete' => 'rm', // TP5 删除缓存的方法是 rm
+        'has' => 'has'
+    ],
+    // ...
+]
+```
+
+#### 2. 常用框架配置示例
+
+**Laravel / Lumen**:
 ```php
 'cache' => [
     'constructor' => [Illuminate\Support\Facades\Cache::class, 'store'],
-    // ...
+    // Laravel 符合 PSR-16，无需配置 method
 ]
 ```
 
-**ThinkPHP 6 配置示例**:
+**ThinkPHP 6**:
 ```php
 'cache' => [
     'constructor' => [think\Facade\Cache::class, 'instance'],
-    // ...
+    // TP6 符合 PSR-16，无需配置 method
 ]
 ```
 
-**Hyperf 配置示例**:
+**Hyperf**:
 ```php
 'cache' => [
     'constructor' => function () {
         return \Hyperf\Utils\ApplicationContext::getContainer()->get(\Psr\SimpleCache\CacheInterface::class);
     },
-    // ...
 ]
 ```
 
