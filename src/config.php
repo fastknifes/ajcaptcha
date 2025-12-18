@@ -16,7 +16,7 @@ return [
 
         // 形状类型 (仅在 mode=drawing 时生效): 
         // 'jigsaw' (拼图), 'red_heart' (红桃), 'diamond' (方片), 'spade' (黑桃), 'club' (草花)
-        'shape_type' => 'jigsaw',
+        'shape_type' => 'jigsaw','jigsaw',
 
         /*背景图片路径， 不填使用默认值， 支持string与array两种数据结构。string为默认图片的目录，array索引数组则为具体图片的地址*/
         'backgrounds' => [],

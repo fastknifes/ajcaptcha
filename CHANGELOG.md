@@ -14,8 +14,6 @@
 * **底层优化**: 重构 `ImageUtils`，统一封装 GD 操作，屏蔽 PHP 版本差异。
 * **视觉优化**: 滑块自带内阴影和半透明质感，背景凹槽采用动态变暗逻辑，视觉效果更自然。
 
-### 移除
-* 移除了对旧版像素级缓存 (`is_cache_pixel`) 的强依赖（Drawing 模式下不再需要）。
 
 ## v1.1.2 2021-12-15
 * server 增加`verificationByEncryptCode` 方法，兼容前端二次验证`captchaVerification`值

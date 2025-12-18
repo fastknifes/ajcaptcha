@@ -98,45 +98,68 @@ try {
 
 ```php
 return [
-    'font_file' => '', //自定义字体包路径， 不填使用默认值
+    // --------------------------------------------------------------------
+    // 基础配置
+    // --------------------------------------------------------------------
     
-    // 滑动验证码配置
-    'block_puzzle' => [
-        // 模式: 'drawing' (推荐, 原生绘图), 'resource' (旧版图片模板)
-        'mode' => 'drawing',
+    // 自定义字体包路径，不填使用默认值 (resources/fonts/WenQuanZhengHei.ttf)
+    'font_file' => '', 
 
-        // 形状类型 (仅在 drawing 模式下生效)
-        // 可选: 'jigsaw', 'red_heart', 'spade', 'diamond', 'club'
-        'shape_type' => 'red_heart',
-
-        // 开启干扰图
-        'is_interfere' => true, 
-        
-        // 容错偏移量 (px)
-        'offset' => 10,
-
-        // 背景图路径 (支持 string 目录或 array 文件列表)
-        // 'backgrounds' => '/path/to/images/',
-    ],
-    
-    // 点击验证码配置
-    'click_word' => [
-        // 干扰字数量
-        'distract_num' => 2, 
-        // 目标字数量
-        'word_num' => 4,
-        // 背景图
-        'backgrounds' => [], 
-    ],
-    
     // 水印配置
     'watermark' => [
         'fontsize' => 12,
         'color' => '#ffffff',
         'text' => '我的水印'
     ],
+
+    // --------------------------------------------------------------------
+    // 滑动验证码配置 (Block Puzzle)
+    // --------------------------------------------------------------------
+    'block_puzzle' => [
+        // 模式: 'drawing' (推荐, 原生绘图), 'resource' (旧版图片模板)
+        'mode' => 'drawing',
+
+        // 形状类型 (仅在 drawing 模式下生效)
+        // 可选: 'jigsaw' (拼图), 'red_heart' (红桃), 'spade' (黑桃), 'diamond' (方片), 'club' (草花)
+        'shape_type' => 'jigsaw',
+
+        // 开启干扰图 (在 drawing 模式下生成干扰凹槽，在 resource 模式下生成干扰拼图)
+        'is_interfere' => true, 
+        
+        // 容错偏移量 (px)
+        'offset' => 10,
+
+        // 背景图路径
+        // 支持 string (目录路径) 或 array (文件路径列表)
+        // 'backgrounds' => '/path/to/images/', 
+        'backgrounds' => [], 
+
+        // 模板图路径 (仅在 resource 模式下生效)
+        'templates' => [],
+
+        // 是否开启像素缓存 (仅在 resource 模式下生效，提升性能)
+        'is_cache_pixel' => true,
+    ],
     
-    // 缓存配置 (默认使用内置文件缓存)
+    // --------------------------------------------------------------------
+    // 点击验证码配置 (Click Word)
+    // --------------------------------------------------------------------
+    'click_word' => [
+        // 干扰字数量 (混淆视觉，增加破解难度)
+        'distract_num' => 2, 
+        
+        // 目标字数量 (需要点击的文字数量)
+        'word_num' => 4,
+        
+        // 背景图路径
+        'backgrounds' => [], 
+    ],
+    
+    // --------------------------------------------------------------------
+    // 缓存配置
+    // --------------------------------------------------------------------
+    // 默认使用内置文件缓存 (\Fastknife\Utils\CacheUtils)
+    // 建议在框架中使用框架自带的缓存驱动
     'cache' => [
         'constructor' => \Fastknife\Utils\CacheUtils::class,
         'method' => [
@@ -148,7 +171,7 @@ return [
         'options' => [
             'expire' => 300, // 300秒有效期
             'prefix' => '',
-            'path' => '', // 缓存目录
+            'path' => '', // 缓存目录 (仅内置缓存有效)
         ]
     ]
 ];
