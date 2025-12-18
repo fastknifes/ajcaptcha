@@ -26,7 +26,8 @@ return [
 
         'offset' => 10, //容错偏移量
 
-        // 'is_cache_pixel' => true, // 原有像素缓存配置，在 Drawing 模式下已弃用 (建议移除或忽略)
+        // 是否开启像素缓存 (仅在 mode=resource 时生效，能提升响应性能)
+        'is_cache_pixel' => true,
 
         'is_interfere' => true, //开启干扰图 (仅在 mode=resource 时生效, Drawing 模式暂不支持干扰)
     ],

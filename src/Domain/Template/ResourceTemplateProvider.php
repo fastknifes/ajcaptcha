@@ -11,10 +11,12 @@ use Fastknife\Utils\RandomUtils;
 class ResourceTemplateProvider extends BaseData implements TemplateProviderInterface
 {
     private $templates;
+    private $isCachePixel = false;
 
     public function __construct(array $config)
     {
         $this->templates = $config['block_puzzle']['templates'] ?? [];
+        $this->isCachePixel = $config['block_puzzle']['is_cache_pixel'] ?? false;
     }
 
     public function getTemplateVo(int $bgWidth, int $bgHeight): TemplateVo
@@ -26,6 +28,9 @@ class ResourceTemplateProvider extends BaseData implements TemplateProviderInter
         $src = $this->getRandImage($this->getTemplateImages($this->templates));
 
         $templateVo = new TemplateVo($src);
+        
+        // 处理像素缓存
+        $this->handlePixelCache($templateVo, $src);
 
         // 随机获取偏移量
         // x: 在右半部分随机
@@ -47,11 +52,10 @@ class ResourceTemplateProvider extends BaseData implements TemplateProviderInter
         $src = $this->getRandImage($this->getTemplateImages($this->templates));
         $interfereVo = new TemplateVo($src);
         
-        // 2. 随机位置 (要避开目标)
-        // 简单策略：目标在右半，干扰在左半? 或者全随机但检测碰撞。
-        // 旧逻辑中 block_puzzle.is_interfere 通常是随机位置。
-        // 为了避免重叠，我们尝试在 左半部分 生成。
+        // 处理像素缓存
+        $this->handlePixelCache($interfereVo, $src);
         
+        // 2. 随机位置 (要避开目标)
         $width = imagesx($interfereVo->image);
         $bgHalfWidth = intval($bgWidth / 2);
         
@@ -86,5 +90,34 @@ class ResourceTemplateProvider extends BaseData implements TemplateProviderInter
     {
         $dir = dirname(__DIR__, 3) . '/resources/defaultImages/jigsaw/slidingBlock/';
         return $this->getDefaultImage($dir, $templates);
+    }
+    
+    /**
+     * 处理像素缓存逻辑
+     */
+    private function handlePixelCache(TemplateVo $vo, string $src)
+    {
+        if (!$this->isCachePixel) {
+            return;
+        }
+
+        $cacheFile = $src . '.cache';
+        
+        if (file_exists($cacheFile)) {
+            // 读取缓存
+            $content = file_get_contents($cacheFile);
+            $pickMaps = json_decode($content, true);
+            if (is_array($pickMaps)) {
+                $vo->setPickMaps($pickMaps);
+                return;
+            }
+        }
+        
+        // 生成缓存
+        $vo->preparePickMaps();
+        $pickMaps = $vo->getPickMaps();
+        
+        // 写入文件 (注意权限)
+        @file_put_contents($cacheFile, json_encode($pickMaps));
     }
 }
