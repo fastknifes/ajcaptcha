@@ -165,7 +165,9 @@ class Factory
     {
         $mode = $this->config['block_puzzle']['mode'] ?? 'drawing';
         if ($mode === 'resource') {
-            return new ResourceTemplateProvider($this->config);
+            $provider = new ResourceTemplateProvider($this->config);
+            $provider->setCache($this->getCacheInstance());
+            return $provider;
         }
         return new DrawingTemplateProvider($this->config);
     }

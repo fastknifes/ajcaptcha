@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Fastknife\Domain\Template;
 
 use Fastknife\Domain\Logic\BaseData;
+use Fastknife\Domain\Logic\Cache;
 use Fastknife\Domain\Vo\OffsetVo;
 use Fastknife\Domain\Vo\TemplateVo;
 use Fastknife\Utils\RandomUtils;
@@ -12,11 +13,21 @@ class ResourceTemplateProvider extends BaseData implements TemplateProviderInter
 {
     private $templates;
     private $isCachePixel = false;
+    
+    /**
+     * @var Cache
+     */
+    private $cache;
 
     public function __construct(array $config)
     {
         $this->templates = $config['block_puzzle']['templates'] ?? [];
         $this->isCachePixel = $config['block_puzzle']['is_cache_pixel'] ?? false;
+    }
+    
+    public function setCache(Cache $cache)
+    {
+        $this->cache = $cache;
     }
 
     public function getTemplateVo(int $bgWidth, int $bgHeight): TemplateVo
@@ -97,27 +108,27 @@ class ResourceTemplateProvider extends BaseData implements TemplateProviderInter
      */
     private function handlePixelCache(TemplateVo $vo, string $src)
     {
-        if (!$this->isCachePixel) {
+        // 只有开启了缓存且 Cache 实例已注入才执行
+        if (!$this->isCachePixel || !$this->cache) {
             return;
         }
 
-        $cacheFile = $src . '.cache';
+        // 生成缓存 Key (避免文件名冲突)
+        $cacheKey = 'aj_pixel_' . md5($src);
         
-        if (file_exists($cacheFile)) {
-            // 读取缓存
-            $content = file_get_contents($cacheFile);
-            $pickMaps = json_decode($content, true);
-            if (is_array($pickMaps)) {
-                $vo->setPickMaps($pickMaps);
-                return;
-            }
+        // 尝试从缓存读取
+        $pickMaps = $this->cache->get($cacheKey);
+        
+        if (!empty($pickMaps) && is_array($pickMaps)) {
+            $vo->setPickMaps($pickMaps);
+            return;
         }
         
-        // 生成缓存
+        // 缓存未命中，计算并写入
         $vo->preparePickMaps();
         $pickMaps = $vo->getPickMaps();
         
-        // 写入文件 (注意权限)
-        @file_put_contents($cacheFile, json_encode($pickMaps));
+        // 永久缓存 (或者设置一个较长的过期时间，如 30 天)
+        $this->cache->set($cacheKey, $pickMaps, 86400 * 30);
     }
 }
