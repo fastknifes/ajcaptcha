@@ -14,7 +14,7 @@ PHP实现： https://gitee.com/fastknife/aj-captcha
 文档地址：https://ajcaptcha.beliefteam.cn/captcha-doc/captchaDoc/html.html
 ##### 预览效果
 
-![block](https://gitee.com/anji-plus/captcha/raw/master/images/%E6%BB%91%E5%8A%A8%E6%8B%BC%E5%9B%BE.gif) &emsp;&emsp;![click](https://gitee.com/anji-plus/captcha/raw/master/images/%E7%82%B9%E9%80%89%E6%96%87%E5%AD%97.gif)Java实现： https://gitee.com/anji-plus/captcha
+![block](https://gitee.com/anji-plus/captcha/raw/master/images/%E6%BB%91%E5%8A%A8%E6%8B%BC%E5%9B%BE.gif) &emsp;&emsp;![click](https://gitee.com/anji-plus/captcha/raw/master/images/%E7%82%B9%E9%80%89%E6%96%87%E5%AD%97.gif)
 
 ## ✨ 核心特性 (v2.0)
 
