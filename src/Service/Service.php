@@ -33,6 +33,7 @@ abstract class Service
      * 一次验证
      * @param $token
      * @param $pointJson
+     * @return string|null 返回加密的验证凭证 captchaVerification
      */
     public function check($token, $pointJson)
     {
@@ -43,7 +44,7 @@ abstract class Service
             $cacheEntity->delete($token);
             throw $e;
         }
-        $this->setEncryptCache($token, $pointJson);
+        return $this->setEncryptCache($token, $pointJson);
     }
 
     private function setEncryptCache($token, $pointJson){
@@ -57,6 +58,7 @@ abstract class Service
             ],
             $this->factory->getConfig()['cache']['options']['expire'] ?? 300
         );
+        return $key;
     }
 
 

@@ -31,8 +31,9 @@ class ClickWordController
         $msg = null;
         $error = false;
         $repCode = '0000';
+        $captchaVerification = null;
         try {
-            $service->check($data['token'], $data['pointJson']);
+            $captchaVerification = $service->check($data['token'], $data['pointJson']);
         } catch (\Exception $e) {
             $msg = $e->getMessage();
             $error = true;
@@ -41,7 +42,7 @@ class ClickWordController
         echo json_encode([
             'error' => $error,
             'repCode' => $repCode,
-            'repData' => null,
+            'repData' => $captchaVerification ? ['captchaVerification' => $captchaVerification] : null,
             'repMsg' => $msg,
             'success' => ! $error,
         ]);

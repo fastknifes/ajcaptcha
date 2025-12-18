@@ -64,27 +64,28 @@ $config = require 'src/config.php';
 // --- 获取验证码 ---
 $service = new BlockPuzzleCaptchaService($config);
 $data = $service->get(); 
-// 返回示例：
-// [
-//    'error' => false,
-//    'repCode' => '0000',
-//    'repData' => [
-//        'originalImageBase64' => '...', // 背景图
-//        'jigsawImageBase64' => '...',   // 滑块图
-//        'token' => '...',
-//        'secretKey' => '...' 
-//    ],
-//    'success' => true
-// ]
 
-// --- 二次验证 ---
+// --- 一次验证 (前端滑动/点选后调用) ---
 // $token = $_REQUEST['token'];
-// $pointJson = $_REQUEST['pointJson']; // 前端传递的坐标信息
+// $pointJson = $_REQUEST['pointJson'];
 // try {
-//     $service->check($token, $pointJson);
-//     // 验证成功
+//     // 验证成功会返回加密的 captchaVerification
+//     $captchaVerification = $service->check($token, $pointJson);
+//     
+//     // 将 captchaVerification 返回给前端
+//     // echo json_encode(['success' => true, 'repData' => ['captchaVerification' => $captchaVerification]]);
 // } catch (\Exception $e) {
-//     // 验证失败: $e->getMessage();
+//     // 验证失败
+// }
+
+// --- 二次验证 (业务接口登录/注册时调用) ---
+// 前端将上一步获取的 captchaVerification 传给业务接口
+// $captchaVerification = $_REQUEST['captchaVerification'];
+// try {
+//     $service->verificationByEncryptCode($captchaVerification);
+//     // 验证通过，执行业务逻辑 (登录/注册...)
+// } catch (\Exception $e) {
+//     // 二次验证失败，拦截业务请求
 // }
 ```
 
