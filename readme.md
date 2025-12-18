@@ -174,6 +174,16 @@ return [
 ]
 ```
 
+**Hyperf 配置示例**:
+```php
+'cache' => [
+    'constructor' => function () {
+        return \Hyperf\Utils\ApplicationContext::getContainer()->get(\Psr\SimpleCache\CacheInterface::class);
+    },
+    // ...
+]
+```
+
 ## 💻 前端集成注意事项
 
 前端请求时，请确保 `Content-Type` 设置为 `application/x-www-form-urlencoded`。
