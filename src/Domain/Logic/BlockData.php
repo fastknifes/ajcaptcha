@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Fastknife\Domain\Logic;
 
 
+use Fastknife\Domain\Template\TemplateProviderInterface;
 use Fastknife\Domain\Vo\BackgroundVo;
 use Fastknife\Domain\Vo\OffsetVo;
 use Fastknife\Domain\Vo\TemplateVo;
@@ -16,6 +17,11 @@ class BlockData extends BaseData
     protected $defaultBackgroundPath = '/resources/defaultImages/jigsaw/original/';
 
     protected $faultOffset;
+
+    /**
+     * @var TemplateProviderInterface
+     */
+    protected $templateProvider;
 
     /**
      * @return mixed
@@ -34,87 +40,45 @@ class BlockData extends BaseData
         return $this;
     }
 
+    /**
+     * 设置模板提供者
+     * @param TemplateProviderInterface $provider
+     */
+    public function setTemplateProvider(TemplateProviderInterface $provider)
+    {
+        $this->templateProvider = $provider;
+    }
+
 
     /**
      * 获取剪切模板Vo
      * @param BackgroundVo $backgroundVo
-     * @param array | string $templates
      * @return TemplateVo
      */
-    public function getTemplateVo(BackgroundVo $backgroundVo, $templates = []): TemplateVo
+    public function getTemplateVo(BackgroundVo $backgroundVo): TemplateVo
     {
         $background = $backgroundVo->image;
-        //初始偏移量，让模板图在背景的右1/2位置
-        $bgWidth = intval($background->getWidth() / 2);
-        //随机获取一张图片
-        $src = $this->getRandImage($this->getTemplateImages($templates));
+        $bgWidth = imagesx($background);
+        $bgHeight = imagesy($background);
 
-        $templateVo = new TemplateVo($src);
-
-        //随机获取偏移量
-        $offset = RandomUtils::getRandomInt(0, $bgWidth - $templateVo->image->getWidth() - 1);
-
-        $templateVo->setOffset(new OffsetVo($offset + $bgWidth, 0));
-        return $templateVo;
-    }
-
-
-
-    public function getInterfereVo(BackgroundVo $backgroundVo, TemplateVo $templateVo, $templates = []): TemplateVo
-    {
-        //背景
-        $background = $backgroundVo->image;
-        //模板库去重
-        $templates = $this->exclude($this->getTemplateImages($templates), $templateVo->src);
-
-        //随机获取一张模板图
-        $src = $this->getRandImage($templates);
-
-        $interfereVo = new TemplateVo($src);
-
-        $maxOffsetX = intval($templateVo->image->getWidth()/2);
-        do {
-            //随机获取偏移量
-            $offsetX = RandomUtils::getRandomInt(0, $background->getWidth() - $templateVo->image->getWidth() - 1);
-
-            //不与原模板重复
-            if (
-                abs($templateVo->offset->x - $offsetX) > $maxOffsetX
-            ) {
-                $offsetVO = new OffsetVo($offsetX, 0);
-                $interfereVo->setOffset($offsetVO);
-                return $interfereVo;
-            }
-        } while (true);
-    }
-
-
-    /**
-     * @param array|string $templates
-     * @return array|false
-     */
-    protected function getTemplateImages($templates = [])
-    {
-        $dir = dirname(__DIR__, 3) . '/resources/defaultImages/jigsaw/slidingBlock/';
-        return $this->getDefaultImage($dir, $templates);
+        return $this->templateProvider->getTemplateVo($bgWidth, $bgHeight);
     }
 
     /**
-     * 排除
-     * @param $templates
-     * @param $exclude
-     * @return array
+     * 获取干扰模板Vo
+     * @param BackgroundVo $backgroundVo
+     * @param TemplateVo $targetVo
+     * @return TemplateVo
      */
-    protected function exclude($templates, $exclude): array
+    public function getInterfereVo(BackgroundVo $backgroundVo, TemplateVo $targetVo): TemplateVo
     {
-        if (false !== ($key = array_search($exclude, $templates))) {
-            array_splice($templates,$key,1);
-        }
-        return $templates;
+        $background = $backgroundVo->image;
+        $bgWidth = imagesx($background);
+        $bgHeight = imagesy($background);
+        
+        return $this->templateProvider->getInterfereVo($bgWidth, $bgHeight, $targetVo);
     }
-
-
-
+    
     /**
      * @param $originPoint
      * @param $targetPoint

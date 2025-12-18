@@ -10,8 +10,10 @@ use Fastknife\Domain\Logic\Cache;
 use Fastknife\Domain\Logic\WordImage;
 use Fastknife\Domain\Logic\BlockData;
 use Fastknife\Domain\Logic\WordData;
+use Fastknife\Domain\Template\DrawingTemplateProvider;
+use Fastknife\Domain\Template\ResourceTemplateProvider;
+use Fastknife\Domain\Template\TemplateProviderInterface;
 use Fastknife\Domain\Vo\ImageVo;
-use Intervention\Image\ImageManagerStatic;
 
 class Factory
 {
@@ -29,7 +31,7 @@ class Factory
      */
     public function makeBlockImage(): BlockImage
     {
-        $data = new BlockData();
+        $data = $this->makeBlockData();
         $image = new BlockImage();
         $this->setCommon($image, $data);
         $this->setBlock($image, $data);
@@ -41,7 +43,7 @@ class Factory
      */
     public function makeWordImage(): WordImage
     {
-        $data = new WordData();
+        $data = $this->makeWordData();
         $image = new WordImage();
         $this->setCommon($image, $data);
         $this->setWord($image, $data);
@@ -56,9 +58,6 @@ class Factory
      */
     protected function setCommon(BaseImage $image, BaseData $data)
     {
-        //固定驱动，少量图片处理场景gd性能远远大于imagick
-        ImageManagerStatic::configure(['driver' => 'gd']);
-
         //获得字体数据
         $fontFile = $data->getFontFile($this->config['font_file']);
         $image
@@ -77,41 +76,19 @@ class Factory
         $backgroundVo = $data->getBackgroundVo($this->config['block_puzzle']['backgrounds']);
         $image->setBackgroundVo($backgroundVo);
 
-        $templateVo = $data->getTemplateVo($backgroundVo, $this->config['block_puzzle']['templates']);
+        // 使用注入的 Provider 获取 TemplateVo
+        $templateVo = $data->getTemplateVo($backgroundVo);
 
         $image->setTemplateVo($templateVo);
 
-        $pixelMaps = [$backgroundVo, $templateVo];
+        // 干扰图逻辑 (已适配 Drawing/Resource 双模式)
         if (
             isset($this->config['block_puzzle']['is_interfere']) &&
             $this->config['block_puzzle']['is_interfere'] == true
         ) {
-            $interfereVo = $data->getInterfereVo($backgroundVo, $templateVo, $this->config['block_puzzle']['templates']);
+            $interfereVo = $data->getInterfereVo($backgroundVo, $templateVo);
             $image->setInterfereVo($interfereVo);
-            $pixelMaps[] = $interfereVo;
         }
-
-        if (
-            isset($this->config['block_puzzle']['is_cache_pixel']) &&
-            $this->config['block_puzzle']['is_cache_pixel'] === true
-        ) {
-            $cache = $this->getCacheInstance();
-            foreach ($pixelMaps as $vo) {
-                /**@var ImageVo $vo * */
-                $key = 'image_pixel_map_' . $vo->src;
-                $result = $cache->get($key);
-                if (!empty($result) && is_array($result)) {
-                    $vo->setPickMaps($result);
-                } else {
-                    $vo->preparePickMaps();
-                    $vo->setFinishCallback(function (ImageVo $imageVo) use ($cache, $key) {
-                        $cache->set($key, $imageVo->getPickMaps());
-                    });
-                }
-            }
-        }
-
-
     }
 
     /**
@@ -125,26 +102,35 @@ class Factory
         $backgroundVo = $data->getBackgroundVo($this->config['click_world']['backgrounds']);
         $image->setBackgroundVo($backgroundVo);
 
+        // 干扰字数量
+        $distractNum = $this->config['click_word']['distract_num'] ?? 2;
+        // 目标字数量
         $wordNum = $this->config['click_world']['word_num'] ?? 3;
-        if($wordNum > 5){
-            // 最多只能写5个字
-            $wordNum = 5;
-        }
-        if($wordNum < 2){
-            // 最少要写2个字
-            $wordNum = 2;
-        }
-        //随机文字坐标
+        
+        // 限制
+        if($wordNum > 5) $wordNum = 5;
+        if($wordNum < 2) $wordNum = 2;
+
+        // 总字数
+        $totalNum = $wordNum + $distractNum;
+
+        // 获取文字列表 (目标 + 干扰)
+        $wordList = $data->getWordList($totalNum);
+
+        // 随机文字坐标 (碰撞检测)
         $pointList = $data->getPointList(
-            $image->getBackgroundVo()->image->getWidth(),
-            $image->getBackgroundVo()->image->getHeight(),
-            $wordNum
+            imagesx($image->getBackgroundVo()->image),
+            imagesy($image->getBackgroundVo()->image),
+            $totalNum
         );
-        $worldList = $data->getWordList(count($pointList));
+        
+        // WordImage 需要渲染所有字
         $image
-            ->setWordList($worldList)
-            ->setWordList($worldList)
+            ->setWordList($wordList)
             ->setPoint($pointList);
+            
+        // 我们可以在 WordImage 中增加一个属性 targetCount
+        $image->setTargetCount($wordNum);
     }
 
     /**
@@ -165,7 +151,23 @@ class Factory
 
     public function makeBlockData(): BlockData
     {
-        return (new BlockData())->setFaultOffset($this->config['block_puzzle']['offset']);
+        $blockData = new BlockData();
+        $blockData->setFaultOffset($this->config['block_puzzle']['offset']);
+        
+        // 注入 TemplateProvider
+        $provider = $this->makeTemplateProvider();
+        $blockData->setTemplateProvider($provider);
+        
+        return $blockData;
+    }
+
+    public function makeTemplateProvider(): TemplateProviderInterface
+    {
+        $mode = $this->config['block_puzzle']['mode'] ?? 'drawing';
+        if ($mode === 'resource') {
+            return new ResourceTemplateProvider($this->config);
+        }
+        return new DrawingTemplateProvider($this->config);
     }
 
     /**

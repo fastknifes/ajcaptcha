@@ -82,17 +82,19 @@ abstract class Service
      */
     public function verificationByEncryptCode(string $encryptCode)
     {
-        $result = $this->factory->getCacheInstance()->get($encryptCode);
+        $cacheEntity = $this->factory->getCacheInstance();
+        $result = $cacheEntity->get($encryptCode);
         if(empty($result)){
             throw new ParamException('参数错误！');
         }
 
+        // 立即删除二次验证码，防止重放
+        $cacheEntity->delete($encryptCode);
+
         try {
             $this->validate($result['token'], $result['point']);
         } finally {
-            $cacheEntity = $this->factory->getCacheInstance();
             $cacheEntity->delete($result['token']);
-            $cacheEntity->delete($encryptCode);
         }
     }
 

@@ -4,23 +4,31 @@ declare(strict_types=1);
 return [
     'font_file' => '', //自定义字体包路径， 不填使用默认值
     //文字验证码
-    'click_world' => [
+    'click_word' => [
         'backgrounds' => [],
-        'word_num' => 4, //写入多少字文字（2-5）
+        'word_num' => 4, //目标字数量（2-5）
+        'distract_num' => 2, //干扰字数量
     ],
     //滑动验证码
     'block_puzzle' => [
+        // 模式: 'drawing' (原生绘图, 抗锯齿, 推荐), 'resource' (原图模板)
+        'mode' => 'drawing',
+
+        // 形状类型 (仅在 mode=drawing 时生效): 
+        // 'jigsaw' (拼图), 'red_heart' (红桃), 'diamond' (方片), 'spade' (黑桃), 'club' (草花)
+        'shape_type' => 'jigsaw',
+
         /*背景图片路径， 不填使用默认值， 支持string与array两种数据结构。string为默认图片的目录，array索引数组则为具体图片的地址*/
         'backgrounds' => [],
 
-        /*模板图,格式同上支持string与array*/
+        /*模板图,格式同上支持string与array (仅在 mode=resource 时生效)*/
         'templates' => [],
 
         'offset' => 10, //容错偏移量
 
-        'is_cache_pixel' => true, //是否开启缓存图片像素值，开启后能提升服务端响应性能（但要注意更换图片时，需要清除缓存）
+        // 'is_cache_pixel' => true, // 原有像素缓存配置，在 Drawing 模式下已弃用 (建议移除或忽略)
 
-        'is_interfere' => true, //开启干扰图
+        'is_interfere' => true, //开启干扰图 (仅在 mode=resource 时生效, Drawing 模式暂不支持干扰)
     ],
     //水印
     'watermark' => [

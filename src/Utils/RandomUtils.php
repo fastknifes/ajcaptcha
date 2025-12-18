@@ -100,7 +100,7 @@ class RandomUtils
         if ($type === 3){
             $maps = "{$numbs}{$chars}";
         }
-        $string = $maps[self::getRandomInt(1, strlen($maps) - 1)];
+        $string = $maps[self::getRandomInt(0, strlen($maps) - 1)];
         while (strlen($string) < $length) {
             $string .= $maps[self::getRandomInt(0, strlen($maps) - 1)];
         }

@@ -13,4 +13,4 @@ test/html
 test/nginx.htaccess
 test/.htaccess
 test/runtime
-
+docs/*
