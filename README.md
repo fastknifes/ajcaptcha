@@ -7,6 +7,15 @@
 这个类库使用 PHP 实现了行为验证码（滑动拼图、点选文字）。
 v2.0 版本基于 **Strategy Pattern（策略模式）** 彻底重构了底层架构，移除了第三方图像库依赖，引入了原生 GD 绘图与抗锯齿技术，带来了更极致的体验与更高的性能。
 
+Java实现： https://gitee.com/belief-team/captcha
+
+PHP实现： https://gitee.com/fastknife/aj-captcha
+
+文档地址：https://ajcaptcha.beliefteam.cn/captcha-doc/captchaDoc/html.html
+##### 预览效果
+
+![block](https://gitee.com/anji-plus/captcha/raw/master/images/%E6%BB%91%E5%8A%A8%E6%8B%BC%E5%9B%BE.gif) &emsp;&emsp;![click](https://gitee.com/anji-plus/captcha/raw/master/images/%E7%82%B9%E9%80%89%E6%96%87%E5%AD%97.gif)Java实现： https://gitee.com/anji-plus/captcha
+
 ## ✨ 核心特性 (v2.0)
 
 *   **轻量零依赖**：彻底移除 `intervention/image`，完全基于 PHP 原生 GD 库，体积更小，兼容性更强（PHP 7.1 ~ 8.5+）。
