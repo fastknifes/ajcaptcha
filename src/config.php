@@ -6,7 +6,7 @@ return [
     //文字验证码
     'click_word' => [
         'backgrounds' => [],
-        'word_num' => 4, //目标字数量（2-5）
+        'word_num' => 3, //目标字数量（2-5）
         'distract_num' => 2, //干扰字数量
     ],
     //滑动验证码
@@ -16,7 +16,7 @@ return [
 
         // 形状类型 (仅在 mode=drawing 时生效): 
         // 'jigsaw' (拼图), 'red_heart' (红桃), 'diamond' (方片), 'spade' (黑桃), 'club' (草花)
-        'shape_type' => 'jigsaw','jigsaw',
+        'shape_type' => 'jigsaw',
 
         /*背景图片路径， 不填使用默认值， 支持string与array两种数据结构。string为默认图片的目录，array索引数组则为具体图片的地址*/
         'backgrounds' => [],
@@ -24,7 +24,7 @@ return [
         /*模板图,格式同上支持string与array (仅在 mode=resource 时生效)*/
         'templates' => [],
 
-        'offset' => 10, //容错偏移量
+        'offset' => 5, //容错偏移量
 
         // 是否开启像素缓存 (仅在 mode=resource 时生效，能提升响应性能)
         'is_cache_pixel' => true,

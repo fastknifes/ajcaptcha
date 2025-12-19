@@ -99,13 +99,13 @@ class Factory
     protected function setWord(WordImage $image, WordData $data)
     {
         //设置背景
-        $backgroundVo = $data->getBackgroundVo($this->config['click_world']['backgrounds']);
+        $backgroundVo = $data->getBackgroundVo($this->config['click_word']['backgrounds']);
         $image->setBackgroundVo($backgroundVo);
 
         // 干扰字数量
         $distractNum = $this->config['click_word']['distract_num'] ?? 2;
         // 目标字数量
-        $wordNum = $this->config['click_world']['word_num'] ?? 3;
+        $wordNum = $this->config['click_word']['word_num'] ?? 3;
         
         // 限制
         if($wordNum > 5) $wordNum = 5;

@@ -24,12 +24,12 @@ class ClickWordCaptchaService extends Service
             'originalImageBase64' => $wordImage->response(),
             'secretKey' => RandomUtils::getRandomCode(16, 3),
             'token' => RandomUtils::getUUID(),
-            'wordList' => $wordImage->getWordList()
+            'wordList' => $wordImage->getTargetWordList()
         ];
         //缓存
         $cacheEntity->set($data['token'], [
             'secretKey' => $data['secretKey'],
-            'point' => $wordImage->getPoint()
+            'point' => $wordImage->getTargetPointList()
         ],$this->factory->getConfig()['cache']['options']['expire'] ?? 300);
         return $data;
     }

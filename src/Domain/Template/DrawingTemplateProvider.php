@@ -13,6 +13,7 @@ class DrawingTemplateProvider implements TemplateProviderInterface
 {
     // 原尺寸参数 (与前端一致或自定)
     private $scale = 6; // 超采样倍数
+    private $sliderWidth = 47;
     
     // 形状类型
     private $shapeType = 'jigsaw';
@@ -20,20 +21,28 @@ class DrawingTemplateProvider implements TemplateProviderInterface
     public function __construct(array $config)
     {
         $this->shapeType = $config['block_puzzle']['shape_type'] ?? 'jigsaw';
+        $this->sliderWidth = $config['block_puzzle']['slider_width'] ?? 47;
     }
 
     public function getTemplateVo(int $bgWidth, int $bgHeight): TemplateVo
     {
-        // 1. 获取或生成高质量 Mask
+        // 1. 获取或生成高质量 Mask（原始尺寸，仅形状高度）
         $maskImage = $this->getMaskImage();
+        $maskImage = ImageUtils::resize($maskImage, $this->sliderWidth, $this->sliderWidth);
 
-        // 2. 封装为 TemplateVo
+        $tmplW = imagesx($maskImage);
+        $tmplH = imagesy($maskImage);
+
+        $padded = ImageUtils::create($tmplW, $bgHeight);
+        imagecopy($padded, $maskImage, 0, 5, 0, 0, $tmplW, $tmplH);
+
+        ImageUtils::destroy($maskImage);
+
         $templateVo = new TemplateVo(null); // src 为 null
-        $templateVo->image = $maskImage;    // 直接注入资源
+        $templateVo->image = $padded;       // 注入已填充到背景高度的资源
 
-        // 3. 计算偏移量
         $bgHalfWidth = intval($bgWidth / 2);
-        $tmplWidth = imagesx($maskImage);
+        $tmplWidth = imagesx($padded);
 
         $maxOffsetX = $bgHalfWidth - $tmplWidth - 1;
         $maxOffsetX = max(0, $maxOffsetX);
@@ -47,27 +56,30 @@ class DrawingTemplateProvider implements TemplateProviderInterface
     
     public function getInterfereVo(int $bgWidth, int $bgHeight, TemplateVo $targetVo): TemplateVo
     {
-        // 1. 复用 Mask
         $maskImage = $this->getMaskImage();
-        
+        $maskImage = ImageUtils::resize($maskImage, $this->sliderWidth, $this->sliderWidth);
+
+        $tmplW = imagesx($maskImage);
+        $tmplH = imagesy($maskImage);
+        $padded = ImageUtils::create($tmplW, $bgHeight);
+        imagecopy($padded, $maskImage, 0, 0, 0, 0, $tmplW, $tmplH);
+        ImageUtils::destroy($maskImage);
+
         $interfereVo = new TemplateVo(null);
-        $interfereVo->image = $maskImage;
+        $interfereVo->image = $padded;
         
-        // 2. 随机位置 (避开目标)
         $bgHalfWidth = intval($bgWidth / 2);
-        $tmplWidth = imagesx($maskImage);
+        $tmplWidth = imagesx($padded);
         
         $maxOffsetX = $bgHalfWidth - $tmplWidth - 5;
         $maxOffsetX = max(0, $maxOffsetX);
         
         $offset = RandomUtils::getRandomInt(5, $maxOffsetX);
         
-        // y 轴随机 (0 ~ bgHeight - tmplHeight)
-        $tmplHeight = imagesy($maskImage);
+        $tmplHeight = $tmplH;
         $maxOffsetY = $bgHeight - $tmplHeight;
         $maxOffsetY = max(0, $maxOffsetY);
         
-        // 确保 Y 轴不与目标重叠 (minDistance = tmplHeight)
         $minDistance = $tmplHeight;
         $targetY = $targetVo->offset->y;
         $maxRetries = 20;
@@ -79,7 +91,7 @@ class DrawingTemplateProvider implements TemplateProviderInterface
         } while (abs($y - $targetY) < $minDistance && $retry < $maxRetries);
         
         $interfereVo->setOffset(new OffsetVo($offset, $y));
-        
+
         return $interfereVo;
     }
 

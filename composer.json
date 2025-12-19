@@ -21,5 +21,11 @@
         "psr-4": {
             "Fastknife\\": "src"
         }
+    },
+    "archive": {
+        "exclude": [
+            "test/",
+            "tests/"
+        ]
     }
 }

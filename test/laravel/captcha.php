@@ -6,8 +6,10 @@ declare(strict_types=1);
 return [
     'font_file' => '', //自定义字体包路径， 不填使用默认值
     //文字验证码
-    'click_world' => [
-        'backgrounds' => []
+    'click_word' => [
+        'backgrounds' => [],
+        'word_num' => 3,
+        'distract_num' => 2
     ],
     //滑动验证码
     'block_puzzle' => [
