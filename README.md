@@ -304,6 +304,57 @@ src/
 5.  **下采样**：使用 `imagecopyresampled` 将大图缩放回原尺寸，生成高质量的 Alpha Mask。
 6.  **混合渲染**：利用 Alpha Blending 将 Mask 与背景图混合，实现完美的抠图效果。
 
+
+
+## 🧪 开发环境快速启动
+
+在本仓库中已内置 `test/` 目录作为本地联调与演示入口，使用 PHP 内置开发服务器即可快速启动。
+
+### 准备
+
+- 安装依赖：在项目根目录执行
+```bash
+composer install
+```
+- 确认 PHP 环境满足要求：`PHP >= 7.1`，扩展 `ext-gd`、`ext-openssl` 可用
+
+### 启动服务
+
+- 在项目根目录运行（以 8001 端口为例）：
+```bash
+php -S localhost:8001 -t ./test
+```
+- 浏览器访问：
+  - 前端演示页：`http://localhost:8001/index.html`
+  - 滑动/点击验证码图像直出调试：`http://localhost:8001/testImage.php`（点击验证码：加上 `?mode=word`）
+  - 当前渲染尺寸检查：`http://localhost:8001/inspectSizes.php`
+
+### 本地接口说明
+
+`test/` 目录已提供最小后端接口，前端 `index.html` 的交互将直接请求这些接口：
+- 获取验证码：`GET /get.php?captchaType=blockPuzzle` 或 `GET /get.php?captchaType=clickWord`（f:\php-code\aj-captcha\test\get.php:1）
+- 一次验证：`POST /check.php` 表单参数 `captchaType`、`token`、`pointJson`（f:\php-code\aj-captcha\test\check.php:1）
+- 二次验证：`POST /verification.php`
+  - 方式一：参数 `captchaVerification`（推荐，来自一次验证返回值）（f:\php-code\aj-captcha\test\BlockPuzzleController.php:60）
+  - 方式二：参数 `token` + `pointJson`（f:\php-code\aj-captcha\test\BlockPuzzleController.php:63）
+
+对应控制器实现可参考：
+- 滑动验证码控制器：`test/BlockPuzzleController.php`（f:\php-code\aj-captcha\test\BlockPuzzleController.php:7）
+- 点击验证码控制器：`test/ClickWordController.php`（f:\php-code\aj-captcha\test\ClickWordController.php:9）
+
+### 调试配置
+
+开发时可直接修改 `src/config.php` 来观察不同效果：
+- 切换绘制模式：`block_puzzle.mode = 'drawing' | 'resource'`（原生绘图/旧版图片模板）
+- 形状类型：`block_puzzle.shape_type = 'jigsaw' | 'red_heart' | 'spade' | 'diamond' | 'club'`
+- 干扰开关：`block_puzzle.is_interfere = true | false`
+- 点击验证码干扰字与目标字数量：`click_word.distract_num`、`click_word.word_num`
+
+### 常见问题
+- 图片不显示或异常：确认 `ext-gd` 已启用；Windows 下可在 `php.ini` 中开启 `extension=gd`。
+- 接口 404：确认以 `-t ./test` 作为站点根目录启动，且访问路径与上述接口一致。
+
+
 ## 📝 变更日志
 
 查看 [CHANGELOG.md](./CHANGELOG.md)
