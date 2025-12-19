@@ -16,7 +16,5 @@ $point = json_encode($point);
 //js  FOl3kz52f4xptJ/Zf7MoZYQmYa7C1pjQaWP8QqhcX8FH43SvpCBPhaSqqMbE8D55ufhgjBVor01UZRH3uE6DNw==
 
 
-
-
 //js +5s4V1MeDYk1jpvfwJACJA==
 //php C01B0oArq8aMhlMmSdRbDA==

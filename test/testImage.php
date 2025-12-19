@@ -32,3 +32,4 @@ if (isset($_GET['mode']) && $_GET['mode'] === 'word') {
 } else {
     showBlock($type);
 }
+showBlock();

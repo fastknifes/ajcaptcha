@@ -30,11 +30,13 @@ return [
         'is_cache_pixel' => true,
 
         'is_interfere' => true, //开启干扰图 (仅在 mode=resource 时生效, Drawing 模式暂不支持干扰)
+
+        'blur_num' => 3, //扣图模糊系数。选值1~10之间。数值越大越模糊
     ],
     //水印
     'watermark' => [
         'fontsize' => 12,
-        'color' => '#000000',
+        'color' => '#ffffff',
         'text' => '我的水印'
     ],
     'cache' => [

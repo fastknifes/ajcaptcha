@@ -13,4 +13,9 @@ class MathUtils
     {
         return intval(array_sum($array) / count($array));
     }
+
+    public static function avgFloat(array $array): int
+    {
+        return floatval(array_sum($array) / count($array));
+    }
 }

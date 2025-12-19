@@ -106,6 +106,38 @@ abstract class ImageVo
         $green = [];
         $blue = [];
         $alpha = [];
+        foreach ([
+                     [0, 1], [0, -1],
+                     [1, 0], [-1, 0],
+                     [1, 1], [1, -1],
+                     [-1, 1], [-1, -1],
+                 ] as $distance) //边框取5个点，4个角取3个点，其余取8个点
+        {
+            $pointX = $x + $distance[0];
+            $pointY = $y + $distance[1];
+            if ($pointX < 0 || $pointX >= $image->getWidth() || $pointY < 0 || $pointY >= $image->height()) {
+                continue;
+            }
+            [$r, $g, $b, $a] = $this->getPickColor($pointX, $pointY);
+            $red[] = $r;
+            $green[] = $g;
+            $blue[] = $b;
+            $alpha[] = $a;
+        }
+        return [MathUtils::avg($red), MathUtils::avg($green), MathUtils::avg($blue), MathUtils::avg($alpha)];
+    }
+    /**
+     * @param int $x
+     * @param int $y
+     * @return array
+     */
+    public function getBlurValue(int $x, int $y): array
+    {
+        $image = $this->image;
+        $red = [];
+        $green = [];
+        $blue = [];
+        $alpha = [];
         $w = imagesx($image);
         $h = imagesy($image);
         
