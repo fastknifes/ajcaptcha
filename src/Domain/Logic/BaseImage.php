@@ -86,7 +86,7 @@ abstract class BaseImage
                 (int)($imgH - $margin), // 大概位置，ImageUtils 内部 valign='bottom' 会修正为基线
                 $this->fontFile,
                 $fontSize,
-                [$color[0], $color[1], $color[2], 0], // alpha 0 opaque
+                [$color[0], $color[1], $color[2], 1],
                 0,
                 'right',
                 'bottom'
