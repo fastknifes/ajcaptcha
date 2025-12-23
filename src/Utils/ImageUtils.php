@@ -109,10 +109,10 @@ class ImageUtils
              $alpha = 0; 
         }
 
-        $col = imagecolorallocatealpha($image, $color[0], $color[1], $color[2], $alpha);
+        $col = imagecolorallocatealpha($image, (int)$color[0], (int)$color[1], (int)$color[2], (int)$alpha);
 
         // 计算文字包围盒
-        $bbox = imagettfbbox($fontSize, $angle, $fontFile, $text);
+        $bbox = imagettfbbox((float)$fontSize, (float)$angle, $fontFile, $text);
         // $bbox: 0,1 (LL), 2,3 (LR), 4,5 (UR), 6,7 (UL)
         $textWidth = abs($bbox[4] - $bbox[0]);
         $textHeight = abs($bbox[5] - $bbox[1]); // approximate
@@ -133,7 +133,7 @@ class ImageUtils
         }
         // bottom 不需要修正
 
-        imagettftext($image, $fontSize, $angle, (int)$x, (int)$y, $col, $fontFile, $text);
+        imagettftext($image, (float)$fontSize, (float)$angle, (int)$x, (int)$y, $col, $fontFile, $text);
     }
 
     /**

@@ -89,7 +89,7 @@ abstract class ImageVo
             $alpha = (int)((1 - $color[3]) * 127);
         }
         
-        $col = imagecolorallocatealpha($this->image, $color[0], $color[1], $color[2], $alpha);
+        $col = imagecolorallocatealpha($this->image, (int)$color[0], (int)$color[1], (int)$color[2], (int)$alpha);
         imagesetpixel($this->image, (int)$x, (int)$y, $col);
         // imagecolorallocatealpha 可能会耗尽调色板 (对于真彩色不需要担心)
     }
