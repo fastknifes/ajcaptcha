@@ -5,9 +5,6 @@ namespace Fastknife\Domain\Vo;
 
 class TemplateVo extends ImageVo
 {
-
-    private $borderBoth = [];
-
     /**
      * @var OffsetVo
      */
