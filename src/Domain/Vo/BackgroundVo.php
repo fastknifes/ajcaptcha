@@ -13,41 +13,10 @@ class BackgroundVo extends ImageVo
     {
         parent::__construct($src);
         // 设置消除锯齿
-         imageantialias($this->image->getCore(), true);
+        imageantialias($this->image, true);
     }
 
-    /**
-     * @param int $x
-     * @param int $y
-     * @return array
-     */
-    public function getBlurValue(int $x, int $y): array
-    {
-        $image = $this->image;
-        $red = [];
-        $green = [];
-        $blue = [];
-        $alpha = [];
-        foreach ([
-                     [0, 1], [0, -1],
-                     [1, 0], [-1, 0],
-                     [1, 1], [1, -1],
-                     [-1, 1], [-1, -1],
-                 ] as $distance) //边框取5个点，4个角取3个点，其余取8个点
-        {
-            $pointX = $x + $distance[0];
-            $pointY = $y + $distance[1];
-            if ($pointX < 0 || $pointX >= $image->getWidth() || $pointY < 0 || $pointY >= $image->height()) {
-                continue;
-            }
-            [$r, $g, $b, $a] = $this->getBlurPick($pointX, $pointY);
-            $red[] = $r;
-            $green[] = $g;
-            $blue[] = $b;
-            $alpha[] = $a;
-        }
-        return [MathUtils::avg($red), MathUtils::avg($green), MathUtils::avg($blue), MathUtils::avg($alpha)];
-    }
+
 
     /**
      * 记录模糊图片
@@ -60,12 +29,54 @@ class BackgroundVo extends ImageVo
         $this->setBlurPick($targetX, $targetY, $blurColor);
     }
 
-    public function getBlurPick($x, $y)
+    /**
+     * 重写父类方法，优先从模糊缓存获取颜色
+     */
+    public function getPickColor($x, $y): array
     {
-        if (!isset($this->blurAreas[$x][$y])) {
-            return $this->getPickColor($x, $y);
+        // 如果有模糊缓存，使用缓存值
+        if (isset($this->blurAreas[$x][$y])) {
+            return $this->blurAreas[$x][$y];
         }
-        return $this->blurAreas[$x][$y];
+        // 否则调用父类方法从图像读取
+        return parent::getPickColor($x, $y);
+    }
+
+    /**
+     * 获取模糊值（BackgroundVo 专用）
+     * @param int $x
+     * @param int $y
+     * @return array
+     */
+    private function getBlurValue(int $x, int $y): array
+    {
+        $image = $this->image;
+        $red = [];
+        $green = [];
+        $blue = [];
+        $alpha = [];
+        $w = imagesx($image);
+        $h = imagesy($image);
+        
+        foreach ([
+                     [0, 1], [0, -1],
+                     [1, 0], [-1, 0],
+                     [1, 1], [1, -1],
+                     [-1, 1], [-1, -1],
+                 ] as $distance) //边框取5个点，4个角取3个点，其余取8个点
+        {
+            $pointX = $x + $distance[0];
+            $pointY = $y + $distance[1];
+            if ($pointX < 0 || $pointX >= $w || $pointY < 0 || $pointY >= $h) {
+                continue;
+            }
+            [$r, $g, $b, $a] = $this->getPickColor($pointX, $pointY);
+            $red[] = $r;
+            $green[] = $g;
+            $blue[] = $b;
+            $alpha[] = $a;
+        }
+        return [MathUtils::avg($red), MathUtils::avg($green), MathUtils::avg($blue), MathUtils::avg($alpha)];
     }
 
     public function setBlurPick($x, $y, $color)
