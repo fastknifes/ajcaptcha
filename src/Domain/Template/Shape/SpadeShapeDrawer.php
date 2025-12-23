@@ -64,9 +64,8 @@ class SpadeShapeDrawer implements ShapeDrawerInterface
         // 简单的做法：画两个 filledpolygon，然后画两个 polygon 描边。虽然重叠处会有双重描边，但在 Mask 缩放后不太明显。
         
         // 绘制主体
-        $numPoints = count($points) / 2;
-        imagefilledpolygon($big, $points, (int)$numPoints, $contentColor);
-        imagepolygon($big, $points, (int)$numPoints, $shadowColor);
+        ImageUtils::filledPolygon($big, $points, $contentColor);
+        ImageUtils::polygon($big, $points, $shadowColor);
         
         // 绘制柄 (梯形)
         $stemW = 6 * $scale;
@@ -90,12 +89,12 @@ class SpadeShapeDrawer implements ShapeDrawerInterface
             $centerX - $stemW, $stemBottomY
         ];
         
-        imagefilledpolygon($big, $stemPoints, 3, $contentColor);
-        imagepolygon($big, $stemPoints, 3, $shadowColor);
+        ImageUtils::filledPolygon($big, $stemPoints, $contentColor);
+        ImageUtils::polygon($big, $stemPoints, $shadowColor);
         
         // 修复：为了遮盖重叠处的描边，再次填充一次主体和柄的内部（无描边）
-        imagefilledpolygon($big, $points, (int)$numPoints, $contentColor);
-        imagefilledpolygon($big, $stemPoints, 3, $contentColor);
+        ImageUtils::filledPolygon($big, $points, $contentColor);
+        ImageUtils::filledPolygon($big, $stemPoints, $contentColor);
 
         return $big;
     }

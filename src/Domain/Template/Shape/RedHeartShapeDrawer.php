@@ -52,9 +52,8 @@ class RedHeartShapeDrawer implements ShapeDrawerInterface
             $points[] = $py;
         }
 
-        $numPoints = count($points) / 2;
-        imagefilledpolygon($big, $points, (int)$numPoints, $contentColor);
-        imagepolygon($big, $points, (int)$numPoints, $shadowColor);
+        ImageUtils::filledPolygon($big, $points, $contentColor);
+        ImageUtils::polygon($big, $points, $shadowColor);
 
         return $big;
     }

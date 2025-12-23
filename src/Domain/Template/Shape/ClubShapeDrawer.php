@@ -68,8 +68,8 @@ class ClubShapeDrawer implements ShapeDrawerInterface
             $cx + $stemW, $stemBottomY,
             $cx - $stemW, $stemBottomY
         ];
-        imagefilledpolygon($big, $stemPoints, 3, $contentColor);
-        imagepolygon($big, $stemPoints, 3, $shadowColor);
+        ImageUtils::filledPolygon($big, $stemPoints, $contentColor);
+        ImageUtils::polygon($big, $stemPoints, $shadowColor);
         
         // 3. 再次填充内容色 (覆盖内部重叠的线条)
         // 注意：contentColor 是半透明的。叠加会变深。

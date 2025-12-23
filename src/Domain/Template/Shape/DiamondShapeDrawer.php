@@ -42,9 +42,8 @@ class DiamondShapeDrawer implements ShapeDrawerInterface
             $margin, $cy           // Left
         ];
 
-        $numPoints = count($points) / 2;
-        imagefilledpolygon($big, $points, (int)$numPoints, $contentColor);
-        imagepolygon($big, $points, (int)$numPoints, $shadowColor);
+        ImageUtils::filledPolygon($big, $points, $contentColor);
+        ImageUtils::polygon($big, $points, $shadowColor);
 
         return $big;
     }

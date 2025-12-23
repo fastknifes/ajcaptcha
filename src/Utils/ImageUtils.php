@@ -180,6 +180,44 @@ class ImageUtils
     }
 
     /**
+     * 填充多边形（兼容 PHP 8.0 和 8.1+）
+     * PHP 8.1+ 不再需要顶点数量参数
+     * @param resource|\GdImage $image
+     * @param array $points 顶点数组 [x1, y1, x2, y2, ...]
+     * @param int $color 颜色
+     */
+    public static function filledPolygon($image, array $points, int $color)
+    {
+        if (PHP_VERSION_ID >= 80100) {
+            // PHP 8.1+: 不需要顶点数量参数
+            imagefilledpolygon($image, $points, $color);
+        } else {
+            // PHP 8.0: 需要顶点数量参数
+            $numPoints = count($points) / 2;
+            imagefilledpolygon($image, $points, (int)$numPoints, $color);
+        }
+    }
+
+    /**
+     * 绘制多边形边框（兼容 PHP 8.0 和 8.1+）
+     * PHP 8.1+ 不再需要顶点数量参数
+     * @param resource|\GdImage $image
+     * @param array $points 顶点数组 [x1, y1, x2, y2, ...]
+     * @param int $color 颜色
+     */
+    public static function polygon($image, array $points, int $color)
+    {
+        if (PHP_VERSION_ID >= 80100) {
+            // PHP 8.1+: 不需要顶点数量参数
+            imagepolygon($image, $points, $color);
+        } else {
+            // PHP 8.0: 需要顶点数量参数
+            $numPoints = count($points) / 2;
+            imagepolygon($image, $points, (int)$numPoints, $color);
+        }
+    }
+
+    /**
      * 安全销毁图片资源
      * 兼容 PHP 8.0+ (GdImage) 和 PHP 8.5+ (imagedestroy deprecated)
      * @param mixed $image
