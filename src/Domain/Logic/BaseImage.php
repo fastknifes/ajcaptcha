@@ -49,7 +49,7 @@ abstract class BaseImage
             $fontSize = $this->watermark['fontsize'];
             $text = $this->watermark['text'];
             
-            $info = imagettfbbox($fontSize, 0, $this->fontFile, $text);
+            $info = imagettfbbox((float)$fontSize, 0, $this->fontFile, $text);
             $minX = min($info[0], $info[2], $info[4], $info[6]);
             $maxX = max($info[0], $info[2], $info[4], $info[6]);
             $minY = min($info[1], $info[3], $info[5], $info[7]);
