@@ -6,7 +6,6 @@ namespace Fastknife\Domain\Logic;
 
 use Fastknife\Domain\Vo\BackgroundVo;
 use Fastknife\Utils\RandomUtils;
-use Intervention\Image\ImageManagerStatic;
 
 class BaseData
 {
