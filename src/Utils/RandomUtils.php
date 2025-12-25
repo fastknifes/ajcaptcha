@@ -89,7 +89,7 @@ class RandomUtils
     public static function getRandomCode(int $length = 10, int $type = 1): string
     {
         $numbs = '0123456789';
-        $chars = "abcdefghilkmnopqrstuvwxyz";
+        $chars = "abcdefghijlkmnopqrstuvwxyz";
         $maps = '';
         if ($type === 1){
             $maps = $numbs;
