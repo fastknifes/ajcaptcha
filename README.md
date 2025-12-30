@@ -1,6 +1,6 @@
 # AJ-Captcha for PHP
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)
 ![PHP](https://img.shields.io/badge/php-%3E%3D7.1-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
@@ -16,7 +16,7 @@ PHP实现： https://gitee.com/fastknife/aj-captcha
 
 ![block](https://gitee.com/anji-plus/captcha/raw/master/images/%E6%BB%91%E5%8A%A8%E6%8B%BC%E5%9B%BE.gif) &emsp;&emsp;![click](https://gitee.com/anji-plus/captcha/raw/master/images/%E7%82%B9%E9%80%89%E6%96%87%E5%AD%97.gif)
 
-## ✨ 核心特性 (v2.0)
+## ✨ 核心特性 (v2.1)
 
 *   **轻量零依赖**：彻底移除 `intervention/image`，完全基于 PHP 原生 GD 库，体积更小，兼容性更强（PHP 7.1 ~ 8.5+）。
 *   **极致抗锯齿 (Anti-Aliasing)**：
@@ -29,11 +29,12 @@ PHP实现： https://gitee.com/fastknife/aj-captcha
     *   ♠️ 黑桃 (`spade`)
     *   ♦️ 方片 (`diamond`)
     *   ♣️ 草花 (`club`)
+*   **Unicode 图标验证码**：点击验证码支持 Unicode 图标，实现图文混合验证。图片上显示图标（如 ☕），前端提示显示文字说明（如 `<杯子>`），提升趣味性和安全性。
 *   **安全增强**：
     *   **干扰图**：滑动验证码支持随机生成干扰滑块（位置、形状随机），增加机器识别难度。
     *   **干扰字**：点击验证码支持生成随机干扰文字。
     *   **智能布局**：采用 **随机坐标 + 碰撞检测算法**，确保文字不重叠、不越界。
-*   **双模式兼容**：保留了旧版“图片模板”模式 (`resource`)，老用户可无缝切换。
+*   **双模式兼容**：保留了旧版"图片模板"模式 (`resource`)，老用户可无缝切换。
 
 ## 📸 效果预览
 
@@ -159,6 +160,25 @@ return [
         
         // 目标字数量 (需要点击的文字数量)
         'word_num' => 4,
+        
+        // Unicode 图标配置：图标字符 => 文字说明
+        'icons' => [
+            '☎' => '电话',
+            '★' => '星星',
+            '☀' => '太阳',
+            '☂' => '雨伞',
+            '☺' => '笑脸',
+            '♪' => '音符'
+        ],
+        
+        // 图标模式: 'random'=随机出现, 'always'=每次都有, 'never'=从不出现
+        'icon_mode' => 'random',
+        
+        // 最多图标数量
+        'max_icons' => 1,
+        
+        // 图标字体放大比例（相对于汉字）
+        'icon_font_size_scale' => 1.3,
         
         // 背景图路径
         'backgrounds' => [], 
@@ -288,6 +308,7 @@ src/
 │   │
 │   └── Logic/                      # 业务逻辑层
 │       ├── BlockImage.php          # 滑动验证码合成逻辑 (Alpha混合, 挖槽)
+│       ├── WordImage.php           # 点击验证码图像处理 (新增drawWordList支持Unicode图标)
 │       └── ...
 │
 ├── Utils/
@@ -349,6 +370,7 @@ php -S localhost:8001 -t ./test
 - 形状类型：`block_puzzle.shape_type = 'jigsaw' | 'red_heart' | 'spade' | 'diamond' | 'club'`
 - 干扰开关：`block_puzzle.is_interfere = true | false`
 - 点击验证码干扰字与目标字数量：`click_word.distract_num`、`click_word.word_num`
+- Unicode图标配置：`click_word.icons`、`click_word.icon_mode`、`click_word.max_icons`
 
 ### 常见问题
 - 图片不显示或异常：确认 `ext-gd` 已启用；Windows 下可在 `php.ini` 中开启 `extension=gd`。
