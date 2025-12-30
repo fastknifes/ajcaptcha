@@ -124,10 +124,89 @@ class Factory
             $totalNum
         );
         
+        // 图标替换逻辑
+        $iconMap = $this->config['click_word']['icons'] ?? [];
+        $displayList = $wordList; // 前端显示列表
+        $drawList = $wordList;    // 图片绘制列表
+        $iconIndexes = [];        // 图标索引列表
+        
+        // 检查是否启用图标功能
+        $enableIcons = $this->config['click_word']['enable_icons'] ?? true;
+        
+        if ($enableIcons && !empty($iconMap)) {
+            $iconChars = array_keys($iconMap);
+            
+            // 获取图标模式
+            $iconMode = $this->config['click_word']['icon_mode'] ?? 'random';
+            $minIcons = $this->config['click_word']['min_icons'] ?? 0;
+            $maxIcons = $this->config['click_word']['max_icons'] ?? 2;
+            $maxIcons = min($maxIcons, $totalNum);
+            
+            // 根据模式决定图标数量
+            $iconCount = 0;
+            switch ($iconMode) {
+                case 'always':
+                    // 每次都有图标，使用最大值
+                    $iconCount = $maxIcons;
+                    break;
+                case 'never':
+                    // 从不出现图标
+                    $iconCount = 0;
+                    break;
+                case 'random':
+                default:
+                    // 随机出现，在 min 到 max 之间随机
+                    $iconCount = \Fastknife\Utils\RandomUtils::getRandomInt($minIcons, $maxIcons);
+                    break;
+            }
+            
+            // 用于去重，避免同一位置被多次替换
+            $replacedIndexes = [];
+            
+            for ($i = 0; $i < $iconCount; $i++) {
+                // 随机选择替换位置（仅在目标字范围内）
+                $attempts = 0;
+                do {
+                    $index = \Fastknife\Utils\RandomUtils::getRandomInt(0, $wordNum - 1);
+                    $attempts++;
+                } while (in_array($index, $replacedIndexes) && $attempts < 100);
+                
+                // 如果超过尝试次数，跳过这次替换
+                if ($attempts >= 100) {
+                    continue;
+                }
+                
+                $replacedIndexes[] = $index;
+                
+                // 随机选择图标
+                $iconChar = $iconChars[\Fastknife\Utils\RandomUtils::getRandomInt(0, count($iconChars) - 1)];
+                $iconLabel = $iconMap[$iconChar] ?? '';
+                
+                // 绘制列表：使用真实 Unicode 图标
+                $drawList[$index] = $iconChar;
+                
+                // 显示列表：使用尖括号包裹的文字说明
+                if ($iconLabel !== '') {
+                    $displayList[$index] = '<' . $iconLabel . '>';
+                } else {
+                    $displayList[$index] = $iconChar;
+                }
+                
+                // 记录图标索引
+                $iconIndexes[] = $index;
+            }
+        }
+        
         // WordImage 需要渲染所有字
         $image
-            ->setWordList($wordList)
+            ->setWordList($displayList)      // 前端显示用
+            ->setDrawWordList($drawList)     // 图片绘制用
+            ->setIconIndexes($iconIndexes)   // 图标索引
             ->setPoint($pointList);
+        
+        // 设置图标字体放大比例
+        $iconFontSizeScale = $this->config['click_word']['icon_font_size_scale'] ?? 1.3;
+        $image->setIconFontSizeScale($iconFontSizeScale);
             
         // 我们可以在 WordImage 中增加一个属性 targetCount
         $image->setTargetCount($wordNum);

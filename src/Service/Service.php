@@ -106,7 +106,7 @@ abstract class Service
      * @param $point
      * @return array
      */
-    protected function encodePoint($secretKey, $point): array
+    protected function decodePoint($secretKey, $point): array
     {
         $pointJson = AesUtils::decrypt($point, $secretKey);
         if ($pointJson == false) {

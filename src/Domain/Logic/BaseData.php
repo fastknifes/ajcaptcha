@@ -13,7 +13,7 @@ class BaseData
 
     protected $defaultBackgroundPath;
 
-    protected $defaultFontPath = '/resources/fonts/WenQuanZhengHei.ttf';
+    protected $defaultFontPath = '/resources/fonts/SourceHanSansCN-Normal.ttf';
 
     /**
      * 获取字体包文件

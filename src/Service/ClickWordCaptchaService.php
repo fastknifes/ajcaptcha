@@ -48,7 +48,7 @@ class ClickWordCaptchaService extends Service
         //数据实例
         $wordData = $this->factory->makeWordData();
         //解码出来的前端坐标
-        $pointJson = $this->encodePoint($this->originData['secretKey'], $pointJson);
+        $pointJson = $this->decodePoint($this->originData['secretKey'], $pointJson);
         $targetPointList = $wordData->array2Point($pointJson);
 
         //检查

@@ -46,7 +46,7 @@ class BlockPuzzleCaptchaService extends Service
         $blockData = $this->factory->makeBlockData();
 
         //解码出来的前端坐标
-        $targetPoint = $this->encodePoint($this->originData['secretKey'], $pointJson);
+        $targetPoint = $this->decodePoint($this->originData['secretKey'], $pointJson);
         $targetPoint = new PointVo($targetPoint['x'], $targetPoint['y']);
 
         //检查

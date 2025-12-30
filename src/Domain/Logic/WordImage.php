@@ -21,6 +21,21 @@ class WordImage extends BaseImage
     protected $wordList;
     
     /**
+     * @var array 用于图片绘制的实际字符列表（含 Unicode 图标）
+     */
+    protected $drawWordList = [];
+    
+    /**
+     * @var array 图标索引位置列表
+     */
+    protected $iconIndexes = [];
+    
+    /**
+     * @var float 图标字体放大比例
+     */
+    protected $iconFontSizeScale = 1.3;
+    
+    /**
      * @var int 目标字数 (Service 层需要缓存前 N 个)
      */
     protected $targetCount = 0;
@@ -38,6 +53,66 @@ class WordImage extends BaseImage
     public function getWordList()
     {
         return $this->wordList;
+    }
+    
+    /**
+     * 设置绘制列表
+     * @param array $drawWordList
+     * @return self
+     */
+    public function setDrawWordList(array $drawWordList)
+    {
+        $this->drawWordList = $drawWordList;
+        return $this;
+    }
+    
+    /**
+     * 获取绘制列表
+     * @return array
+     */
+    public function getDrawWordList()
+    {
+        return $this->drawWordList;
+    }
+    
+    /**
+     * 设置图标索引列表
+     * @param array $iconIndexes
+     * @return self
+     */
+    public function setIconIndexes(array $iconIndexes)
+    {
+        $this->iconIndexes = $iconIndexes;
+        return $this;
+    }
+    
+    /**
+     * 获取图标索引列表
+     * @return array
+     */
+    public function getIconIndexes()
+    {
+        return $this->iconIndexes;
+    }
+    
+    /**
+     * 设置图标字体放大比例
+     * @param float $scale
+     * @return self
+     */
+    public function setIconFontSizeScale(float $scale)
+    {
+        $this->iconFontSizeScale = $scale;
+        return $this;
+    }
+    
+    /**
+     * 获取图标字体放大比例
+     * @return float
+     */
+    public function getIconFontSizeScale()
+    {
+        return $this->iconFontSizeScale;
     }
     
     public function setTargetCount(int $count)
@@ -80,8 +155,16 @@ class WordImage extends BaseImage
      * 写入文字
      */
     protected function inputWords(){
-        foreach ($this->wordList as $key => $word) {
+        // 优先使用专门的绘制列表，未设置时兼容旧逻辑
+        $words = !empty($this->drawWordList) ? $this->drawWordList : $this->wordList;
+        
+        foreach ($words as $key => $word) {
             $point = $this->point[$key];
+            
+            // 判断当前字符是否为图标，应用不同的字体大小
+            $isIcon = in_array($key, $this->iconIndexes);
+            $fontSize = $isIcon ? (int)(BaseData::FONTSIZE * $this->iconFontSizeScale) : BaseData::FONTSIZE;
+            
             // 使用 ImageUtils 替换 Intervention
             ImageUtils::text(
                 $this->backgroundVo->image,
@@ -89,7 +172,7 @@ class WordImage extends BaseImage
                 $point->x,
                 $point->y,
                 $this->fontFile,
-                BaseData::FONTSIZE,
+                $fontSize,
                 RandomUtils::getRandomColor(), // [r, g, b, a]
                 (float)RandomUtils::getRandomAngle(), // angle
                 'left', // align (ImageUtils::text 修正逻辑基于左下角，这里我们假设 point 是左下角或者中心，原逻辑是 center/center)
