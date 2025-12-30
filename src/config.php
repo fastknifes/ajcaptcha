@@ -2,12 +2,38 @@
 declare(strict_types=1);
 
 return [
-    'font_file' => '', //自定义字体包路径， 不填使用默认值
+    'font_file' => '', //自定义字体包路径， 不填使用默认值（现在是SourceHanSansCN-Normal.ttf）
     //文字验证码
     'click_word' => [
         'backgrounds' => [],
         'word_num' => 3, //目标字数量（2-5）
         'distract_num' => 2, //干扰字数量
+        
+        // Unicode 图标配置：图标字符 => 文字说明
+        // 支持直接使用Unicode字符或转义序列
+        // 如: '⚓' 或 "\u{2693}" (十进制9875)
+        'icons' => [
+            '☎' => '电话',
+            '★' => '星星',
+            '☀' => '太阳',
+            '☂' => '雨伞',
+            '♪' => '音符',
+            '♥' => '红心',
+            '♠' => '黑桃',
+            '✓' => '对勾',
+            '☁' => '云朵',
+            '☃' => '雪人',
+            '♬' => '音乐',
+            '♻' => '回收',
+            '⚽' => '足球',
+            '⚠' => '警告',
+         
+        ],
+        // 图标模式: 'random'=随机出现, 'always'=每次都有, 'never'=从不出现
+        'icon_mode' => 'random',       // 统一控制图标显示行为：'never'=纯汉字, 'always'=必有图标, 'random'=随机出现
+        'min_icons' => 0,              // 最少图标数量 (icon_mode='random'时生效)
+        'max_icons' => 1,              // 最多图标数量
+        'icon_font_size_scale' => 1.3, // 图标字体放大比例（相对于汉字）
     ],
     //滑动验证码
     'block_puzzle' => [
